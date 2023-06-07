@@ -1,0 +1,3 @@
+3dresample -orient RPI -inset FILE+orig.HEAD -prefix FILE.nii
+
+3dcopy FILE.nii FILE+orig
