@@ -1,0 +1,31 @@
+afni_proc.py                                                                \
+    -subj_id                  mouse1                                        \
+    -blocks                   despike tshift align tlrc volreg blur         \
+                              mask scale regress                            \
+    -copy_anat                mouse_anat.nii.gz                             \
+    -dsets                    mouse_func1+orig.HEAD                         \
+    -tcat_remove_first_trs    2                                             \
+    -align_opts_aea           -cost lpc+ZZ -skullstrip_opts -rat -use_skull \
+    -tlrc_base                TT_N27+tlrc                                   \
+    -tlrc_NL_warp                                                           \
+    -volreg_align_to          MIN_OUTLIER                                   \
+    -volreg_align_e2a                                                       \
+    -volreg_tlrc_warp                                                       \
+    -volreg_warp_dxyz         0.5                                          \
+    -blur_size                4                                             \
+    -mask_segment_anat        yes                                           \
+    -mask_segment_erode       yes                                           \
+    -mask_import              Tvent mouse_ventricles_0.5mm+tlrc                   \
+    -mask_intersect           Svent CSFe Tvent                              \
+    -mask_epi_anat            yes                                           \
+    -regress_motion_per_run                                                 \
+    -regress_ROI_PC           Svent 3                                       \
+    -regress_ROI_PC_per_run   Svent                                         \
+    -regress_make_corr_vols   WMe Svent                                     \
+    -regress_anaticor_fast                                                  \
+    -regress_censor_motion    0.2                                           \
+    -regress_censor_outliers  0.05                                          \
+    -regress_apply_mot_types  demean deriv                                  \
+    -regress_est_blur_epits                                                 \
+    -regress_est_blur_errts                                                 \
+    -regress_run_clustsim     yes
