@@ -53,8 +53,10 @@ os.system(f"3dvolreg -verbose -zpad 1 -cubic -base 2 -1Dfile {motion_measures_pa
 
 T1_reoriented_path = output + 'e_T1_reoriented.nii.gz'
 T1_to_Atlas_filename = 'e_T1_to_Atlas_'
-T1_to_Atlas_matrix_path = output + f'{T1_to_Atlas_filename}0GenericAffine.mat')
-T1_registered_path = output + 'e_T1_Registered.nii.gz'
+T1_to_Atlas_matrix_path = output + f'{T1_to_Atlas_filename}0GenericAffine.mat'
+T1_registered_path = output + 'e_T1_registered.nii.gz'
+T1_resampled_path = output + 'e_T1_resampled.nii.gz'
+
 os.system(f"c3d {T1_masked_path} -orient RAI -o {T1_reoriented_path}")
 os.system(f"/opt/ANTs/bin/antsRegistration -v 1 -d 3 -m Mattes[ {atlas_path}, {T1_reoriented_path}, 1, 32, None ] -r [ {atlas_path}, {T1_reoriented_path}, 1 ]  -t affine[0.1] -c [300x300x0x0, 1e-8, 20 ] -s 4x2x1x0.5vox -f 6x4x2x1 -u 1 -z 1 -o {output}{T1_to_Atlas_filename}")
 os.system(f"/opt/ANTs/bin/antsApplyTransforms -d 3 -e 0 --float -i {T1_reoriented_path} -r {atlas_path} -o {T1_registered_path} -t {T1_to_Atlas_matrix_path}")
@@ -70,7 +72,7 @@ for i in range(int(bold_data.shape[3])):
 
 vol_0_path = split_fMRI_path + 'vol_0.nii.gz'
 fMRI_to_T1_filename = 'f_fMRI_to_T1_'
-fMRI_to_T1_matrix_path = split_fMRI_path + f'{fMRI_to_T1_filename}0GenericAffine.mat')
+fMRI_to_T1_matrix_path = split_fMRI_path + f'{fMRI_to_T1_filename}0GenericAffine.mat'
 
 os.system("/opt/ANTs/bin/antsRegistration -v 1 -d 3 -m Mattes[ {T1_masked_path}, {vol_0_path}, 1, 32, None ] -r [ {T1_masked_path}, {vol_0_path}, 1 ]  -t affine[0.1] -c [300x300x0x0, 1e-8, 20 ] -s 4x2x1x0.5vox -f 6x4x2x1 -u 1 -z 1 -o {fMRI_to_T1_filename}")
 
