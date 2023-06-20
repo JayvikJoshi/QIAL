@@ -10,10 +10,14 @@ import pandas as pd
 
 subj = 'A22040401'
 my_path = '/Users/Jayvik/Desktop/preproc/Pipeline_Testing/'
+input_path = my_path + subj + '/'
+
 afni_path = '/Users/Jayvik/abin/'
+fsl_path = '/usr/local/fsl/share/fsl/bin/'
 ants_path = '/opt/ANTs/bin/'
 c3d_path = '/Applications/Convert3DGUI.app/Contents/bin/'
 
+#inputting files
 fMRI_file_path = input_path + subj + '_fMRI.nii.gz'
 T1_file_path = input_path + subj + '_T1.nii.gz'
 B0_file_path = input_path + subj + '_B0.nii.gz'
@@ -25,8 +29,7 @@ wm_mask_path = my_path + 'wm_mask.nii.gz'
 
 
 
-#setting up subject's input path
-input_path = my_path + + subj + '/'
+
 
 #loading fMRI, T1, B0, binarized mask data
 fMRI = nib.load(fMRI_file_path)
@@ -76,9 +79,9 @@ T1_masked_path= pb01 + 'T1_masked.nii.gz'
 #extracting echos and removing first 3 volumes
 
 beginVolume = 4
-seq = range(beginVolume*3, bold_data.shape[3], 3)
-echo1 = bold_data[:,:,:,seq]
-func_echo1_nii = nib.Nifti1Image(echo1,bold.affine)
+seq = range(beginVolume*3, fMRI_data.shape[3], 3)
+echo1 = fMRI_data[:,:,:,seq]
+func_echo1_nii = nib.Nifti1Image(echo1,fMRI.affine)
 nib.save(func_echo1_nii, pb02 + 'func_echo1.nii.gz')
 func_echo1_path = pb02 + 'func_echo1.nii.gz'
 
@@ -106,7 +109,7 @@ os.system(f"{ants_path}antsRegistration -v 1 -d 3 -m Mattes[ {atlas_path}, {T1_r
 T1_registered_path = pb06 + 'T1_registered.nii.gz'
 os.system(f"{ants_path}antsApplyTransforms -d 3 -e 0 --float -i {T1_reoriented_path} -r {atlas_path} -o {T1_registered_path} -t {T1_to_Atlas_matrix_path}")
 
-T1_resampled_path = pb06 + '1_resampled.nii.gz'
+T1_resampled_path = pb06 + 'T1_resampled.nii.gz'
 os.system(f"{ants_path}ResampleImageBySpacing 3 {T1_registered_path} {T1_resampled_path} 0.1 0.1 0.1 0 0 0")
 
 #splitting fMRI volumes
@@ -119,7 +122,7 @@ split_data = split.get_fdata()
 
 for i in range(int(split_data.shape[3])):
     split_data_i = split_data[:,:,:,i]
-    squeezed = squeeze_image(nib.Nifti1Image(split_data_i, bold.affine))
+    squeezed = squeeze_image(nib.Nifti1Image(split_data_i, split.affine))
     nib.save(squeezed, split_fMRI_path + "vol_" + str(i) + ".nii.gz")
 
 #fMRI registering to Atlas
@@ -130,6 +133,15 @@ fMRI_to_T1_filename = 'fMRI_to_T1_'
 fMRI_to_T1_matrix_path = pb07 + f'{fMRI_to_T1_filename}0GenericAffine.mat'
 os.system(f"{ants_path}antsRegistration -v 1 -d 3 -m Mattes[ {T1_masked_path}, {vol_0_path}, 1, 32, None ] -r [ {T1_masked_path}, {vol_0_path}, 1 ]  -t affine[0.1] -c [300x300x0x0, 1e-8, 20 ] -s 4x2x1x0.5vox -f 6x4x2x1 -u 1 -z 1 -o {pb07}{fMRI_to_T1_filename}")
 
+#b0 registered to first volume
+
+B0_to_fMRI_filename = 'B0_to_fMRI_'
+B0_to_fMRI_registered_0_path = pb07 + f'{B0_to_fMRI_filename}registered_0.nii.gz'
+os.system(f"{ants_path}antsApplyTransforms -d 3 -e 0 -i {B0_file_path} -r {vol_0_path} -u float -o {B0_to_fMRI_registered_0_path}")
+
+B0_to_fMRI_applied_path = split_fMRI_path + f'{B0_to_fMRI_filename}applied_'
+N4Bias_applied_path = split_fMRI_path + 'N4Bias_applied_'
+bias_bold_path = split_fMRI_path + 'bias_bold'
 fMRI_to_T1_registered_path = split_fMRI_path + f'{fMRI_to_T1_filename}registered_' #+(i).nii.gz
 fMRI_to_Atlas_filename = 'fMRI_to_Atlas_'
 fMRI_to_Atlas_reoriented_path = split_fMRI_path + f'{fMRI_to_Atlas_filename}reoriented_'
@@ -137,14 +149,22 @@ fMRI_to_Atlas_registered_path = split_fMRI_path + f'{fMRI_to_Atlas_filename}regi
 fMRI_to_Atlas_resampled_path = split_fMRI_path + f'{fMRI_to_Atlas_filename}resampled_'
 splitFile_suffix = ".nii.gz"
 
-for i in range(100): #split_data.shape[3]
-    os.system(f"{ants_path}antsApplyTransforms -d 3 -e 0 --float -i {split_fMRI_path}vol_"+str(i)+f"{splitFile_suffix} -r {T1_masked_path} -o {fMRI_to_T1_registered_path}"+str(i)+f"{splitFile_suffix} -t {fMRI_to_T1_matrix_path}")
+for i in range(3): #split_data.shape[3]
+    #registered b0 applied to all volumes
+    os.system(f"{fsl_path}fugue -i {split_fMRI_path}vol_"+str(i)+f"{splitFile_suffix} --dwell=0.00139 --loadfmap={B0_to_fMRI_registered_0_path} -s 0.3 --unwarpdir=x- -v -u {B0_to_fMRI_applied_path}"+str(i)+f"{splitFile_suffix}")
+    #N4BiasFieldCorrection
+    os.system(f"{ants_path}N4BiasFieldCorrection -d 3 -v 1 -s 2 -b [ 2x2x2 , 3 ] -c [ 100 x 50, 1e-6 ] -i {B0_to_fMRI_applied_path}"+str(i)+f"{splitFile_suffix} -o [{N4Bias_applied_path}"+str(i)+f"{splitFile_suffix},{bias_bold_path}"+str(i)+f"{splitFile_suffix}]")
+    #all volumes registered to T1
+    os.system(f"{ants_path}antsApplyTransforms -d 3 -e 0 --float -i {N4Bias_applied_path}"+str(i)+f"{splitFile_suffix} -r {T1_masked_path} -o {fMRI_to_T1_registered_path}"+str(i)+f"{splitFile_suffix} -t {fMRI_to_T1_matrix_path}")
+    #all volumes registered to atlas (using T1 to atlas transformations)
     os.system(f"{c3d_path}c3d {fMRI_to_T1_registered_path}"+str(i)+f"{splitFile_suffix} -orient RAI -o {fMRI_to_Atlas_reoriented_path}"+str(i)+f"{splitFile_suffix}")
     os.system(f"{ants_path}antsApplyTransforms -d 3 -e 0 --float -i {fMRI_to_Atlas_reoriented_path}"+str(i)+f"{splitFile_suffix} -r {atlas_path} -o {fMRI_to_Atlas_registered_path}"+str(i)+f"{splitFile_suffix} -t {T1_to_Atlas_matrix_path}")
     os.system(f"{ants_path}ResampleImageBySpacing 3 {fMRI_to_Atlas_registered_path}"+str(i)+f"{splitFile_suffix} {fMRI_to_Atlas_resampled_path}"+str(i)+f"{splitFile_suffix} 0.3 0.3 0.3 0 0 0")
 
 
 #recombining and saving volumes
+fMRI_bias_corrected_recombined_path = pb07 + 'fMRI_bias_corrected_recombined.nii.gz'
+os.system(f"{ants_path}ImageMath 4 {fMRI_bias_corrected_recombined_path} TimeSeriesAssemble 1 0 {N4Bias_applied_path}*{splitFile_suffix}")
 
 fMRI_to_T1_registered_recombined_path = pb07 + 'fMRI_to_T1_registered_recombined.nii.gz'
 os.system(f"{ants_path}ImageMath 4 {fMRI_to_T1_registered_recombined_path} TimeSeriesAssemble 1 0 {fMRI_to_T1_registered_path}*{splitFile_suffix}")
@@ -166,13 +186,13 @@ os.system(f"{afni_path}3dDespike -NEW -nomask -prefix {fMRI_despiked_path} {fMRI
 
 #detrending
 
-fMRI_detrend_path = pb08 + 'fMRI_detrend.nii.gz'
-os.system(f"{afni_path}3dDetrend -polort 9 -prefix {fMRI_detrend_path} {fMRI_despiked_path}")
+#fMRI_detrend_path = pb08 + 'fMRI_detrend.nii.gz'
+#os.system(f"{afni_path}3dDetrend -polort 9 -prefix {fMRI_detrend_path} {fMRI_despiked_path}")
 
 #blurring
 
 fMRI_blur_path = pb08 + 'fMRI_blur.nii.gz'
-os.system(f"{afni_path}3dBlurInMask -input {fMRI_detrend_path} -prefix {fMRI_blur_path} -FWHM 0.45 -mask {atlas_mask_path}")
+os.system(f"{afni_path}3dBlurInMask -input {fMRI_despiked_path} -prefix {fMRI_blur_path} -FWHM 0.45 -mask {atlas_mask_path}")
 
 #scaling
 
@@ -200,5 +220,5 @@ os.system(f"{afni_path}3dDeconvolve -input {fMRI_scaled_path} -ortvec {csf_mean_
 
 #bandpassing
 
-errts_nii_gz = pb09 + subj + 'errts.nii.gz'
+errts_nii_gz = pb09 + subj + '_errts.nii.gz'
 os.system(f"{afni_path}3dTproject -polort 0 -input {fMRI_scaled_path} -ort {X_xmat_1D} -passband 0.01 0.1 -prefix {errts_nii_gz}")

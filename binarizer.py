@@ -12,7 +12,7 @@ from scipy.ndimage import morphology
 from nibabel import load, save, Nifti1Image, processing
 import os
 
-path='pred_mask_A19120504_T1.nii.gz'
+path='./out_dir/pred_mask_A22040401_T1.nii.gz'
 file = nib.load(path)
 file_data=file.get_fdata()
 #thresh=np.median(fil_data)
@@ -20,8 +20,8 @@ thresh=np.quantile(file_data, 0.9)
 thresh=0.00001
 file_data[ file_data < thresh] = 0
 file_data[ file_data >= thresh] = 1
-sum(sum(sum(file_data))) 
-path_out='bin_mask_A19120504_T1.nii.gz';
+sum(sum(sum(file_data)))
+path_out='bin_mask_A22040401_T1.nii.gz';
 
 file_data=file_data.astype(int)#astype(int)
 
@@ -35,12 +35,12 @@ nib.save(file_result, path_out)
 
 
 
-##### loop 
-data_path= 'fmri_pipeline/raw_masks/'
+##### loop
+data_path= '/Users/Jayvik/Desktop/preproc/mask_maker/out_dir/'
 files_list=os.listdir(data_path)
-#files_list.remove('.DS_Store')
+files_list.remove('.DS_Store')
 output = 'T1_mask_binary/'
-
+ 
 dtype=np.int
 thresh=0.0001
 
@@ -58,9 +58,9 @@ for file in files_list:
     file_result= nib.Nifti1Image(file_data, single_file.affine, single_file.header)
     nib.save(file_result, output+file)
     
-   # smoothing 
+   # smoothing
 data_path = output
-files_list=os.listdir(data_path)   
+files_list=os.listdir(data_path)
 for file in files_list:
     single_file=nib.load(data_path + file)
     single_file = nib.processing.smooth_image(single_file, (.1,.1,.1), mode='constant')
