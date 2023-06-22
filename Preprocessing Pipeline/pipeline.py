@@ -149,7 +149,7 @@ fMRI_to_Atlas_registered_path = split_fMRI_path + f'{fMRI_to_Atlas_filename}regi
 fMRI_to_Atlas_resampled_path = split_fMRI_path + f'{fMRI_to_Atlas_filename}resampled_'
 splitFile_suffix = ".nii.gz"
 
-for i in range(3): #split_data.shape[3]
+for i in range(75): #split_data.shape[3]
     #registered b0 applied to all volumes
     os.system(f"{fsl_path}fugue -i {split_fMRI_path}vol_"+str(i)+f"{splitFile_suffix} --dwell=0.00139 --loadfmap={B0_to_fMRI_registered_0_path} -s 0.3 --unwarpdir=x- -v -u {B0_to_fMRI_applied_path}"+str(i)+f"{splitFile_suffix}")
     #N4BiasFieldCorrection
