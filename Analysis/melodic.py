@@ -37,6 +37,10 @@ shutil.copy(melodic_path, final_path + "melodic_out.nii.gz")
 
 ###RUN CLUSTER
 
+os.system(f"{fsl_path}cluster -i {melodic_path} -o {final_path}cluster0.nii.gz --zthresh=1.645")
+
+
+
 split_melodic_path = fsl_output_path + 'split_melodic/'
 if not os.path.isdir(split_melodic_path) : os.mkdir(split_melodic_path)
 
