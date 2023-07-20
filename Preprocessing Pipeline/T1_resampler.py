@@ -14,32 +14,28 @@ import sys, string, os
 import pandas as pd
 import openpyxl
 
-mypath= '/Users/Jayvik/Desktop/inputs/'
+mypath= '/Users/Jayvik/Desktop/regs/'
 
 #construct csf and wm mask
 #
-list_fmir_folders_path ='/Users/Jayvik/Desktop/inputs/'
-list_fmri_folders = os.listdir(list_fmir_folders_path)
-list_of_subjs_long = [i for i in list_fmri_folders if 'T1' in i]
+list_fmri_folders = os.listdir(mypath)
+list_of_subjs_long = [i for i in list_fmri_folders if 'regs' in i]
 
 
-label_path_res= mypath+'chass_symmetric3_labels_PLI_res.nii.gz'
-#os.system('/Applications/ANTS/antsApplyTransforms -d 3 -e 0 --float  -u float -i ' +mypath + 'olfac_amyg_hippo.nii.gz -n NearestNeighbor -r '+label_path_res+" -o "+mypath + 'olfac_amyg_hippo_0P3.nii.gz') 
+#os.system('/Applications/ANTS/antsApplyTransforms -d 3 -e 0 --float  -u float -i ' +mypath + 'olfac_amyg_hippo.nii.gz -n NearestNeighbor -r '+label_path_res+" -o "+mypath + 'olfac_amyg_hippo_0P3.nii.gz')
 
 for subj in list_of_subjs_long:
     #print(subj)
-    #fmri_file = list_fmir_folders_path +subj + "/ses-1/func/" + subj +"_ses-1_bold.nii.gz" 
+    #fmri_file = list_fmir_folders_path +subj + "/ses-1/func/" + subj +"_ses-1_bold.nii.gz"
     #nib.load(fmri_file)
     #python_command = "python /mnt/munin6/Badea/Lab/mouse/fmri_pipeline/fmri_prep.py "+subj
     #job_name = job_descrp + "_"+ subj
-    #command = GD + "submit_sge_cluster_job.bash " + sbatch_folder_path + " "+ job_name + " 0 0 '"+ python_command+"'"   
+    #command = GD + "submit_sge_cluster_job.bash " + sbatch_folder_path + " "+ job_name + " 0 0 '"+ python_command+"'"
     #os.system(command)
     subj_path_T1 = mypath + subj
-    ref = '/Users/Jayvik/Desktop/inputs/chass_atlas_labels.nii'
-    T1_res = mypath + subj[:18] + "res.nii"
-    os.system(f"/Users/alex/ANTS_install/build/ANTS-build/Examples/antsApplyTransforms -d 3 -e 0 --float  -u float -i {subj_path_T1} -n NearestNeighbor -r {ref} -o  {T1_res}") 
-
-/Users/alex/ANTS_install/build/ANTS-build/Examples/antsApplyTransforms -d 3 -e 0 --float  -u float -i /Users/Jayvik/Desktop/conn_testing/APOE2_A22040401_T1.nii -n NearestNeighbor -r /Users/Jayvik/Desktop/amyg_hippo_olfactory.nii -o /Users/Jayvik/Desktop/T1_resampled.nii.gz
+    ref = mypath + '/chass_atlas_labels.nii'
+    T1_res = mypath + subj[:9] + "_T1.nii.gz"
+    os.system(f"/Users/alex/ANTS_install/build/ANTS-build/Examples/antsApplyTransforms -d 3 -e 0 --float  -u float -i {subj_path_T1} -n NearestNeighbor -r {ref} -o  {T1_res}")
 
 '''
 
