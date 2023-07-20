@@ -19,4 +19,4 @@ wm_data = wm.get_data()
 gm_data = atlas_data - csf_data - wm_data
 
 # Save the result
-nib.save(nib.Nifti1Image(gm_data, atlas.affine, atlas.header), in_dir + "gm_mask.nii.gz")
+nib.save(nib.Nifti1Image(gm_data, atlas.affine, atlas.header), in_dir + "gm_mask.nii")

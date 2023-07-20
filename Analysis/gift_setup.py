@@ -1,6 +1,8 @@
 import os
 
 in_dir = r"C:\Users\jayvi\Desktop\QIAL\GIFT Testing\input\APOE4_4HN\\"
+
+"""
 for file in os.listdir(in_dir):
     filepath = in_dir + file
     if file.endswith(".nii.gz"):
@@ -11,7 +13,7 @@ for file in os.listdir(in_dir):
         new_filepath = out_dir + file
         if not os.path.isdir(out_dir) : os.mkdir(out_dir)
         os.rename(filepath, new_filepath)
-
+"""
 
 
 #for file in os.listdir(in_dir):
