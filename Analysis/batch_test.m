@@ -10,10 +10,14 @@ TR = 2.252;
 ICA_components = 20;
 DYN_components = 20;
 
+%import datasheet
+data = readtable("C:\Users\jayvi\Desktop\data_csv.csv");
+numRows = size(data, 1)
+numCols = size(data, 2)
 
-%covariates_2ndlvl_names = ['Age', 'Male', 'Female', 'HFD_diet', 'Control_diet', 'APOE2', 'APOE3', 'APOE4', 'APOE2HN', 'APOE3HN', 'APOE4HN']; %import names from csv
-%covariates_2ndlvl_data = [[], []] %2D array of covariate data
-
+covariate_headers = data.Properties.VariableNames(2:end)
+covariate_name = covariate_headers{1}
+covariate_data = data.(covariate_headers{1})
 
 %Setting up directories
 input_dir = '/Users/Jayvik/Desktop/run01_inputs/';
