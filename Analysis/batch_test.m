@@ -2,7 +2,7 @@ clear BATCH;
 
 %variables
 
-project_name = 'conn_batchtest_02.mat';
+project_name = 'conn_batchtest_Jul22.mat';
 
 n=104; %number of subjects
 r=1; %number of runs (sessions)
@@ -23,7 +23,7 @@ input_dir = '/Users/Jayvik/Desktop/run01_inputs/';
 reference_dir = strcat(input_dir, 'reference_maps/');
 fmri_dir = strcat(input_dir, 'processed_fmri/');
 T1_dir = strcat(input_dir, 'processed_T1/');
-output_dir = '/Users/Jayvik/Documents/conn/';
+output_dir = '/Users/Jayvik/Desktop/conn_output/';
 
 %Referencing maps
 gm_mask_filename = strcat(reference_dir, 'gm_mask.nii');
@@ -37,7 +37,7 @@ networks_filename = strcat(reference_dir, 'amyg_hippo_olfactory.nii');
 files = dir(strcat(reference_dir, 'each_region/'));
 roi_files = {};
 
-for k = 3:length(files)
+for k = 4:length(files)
     roi_files{end+1} = strcat(reference_dir, 'each_region/', files(k).name);
 
 end
@@ -127,21 +127,19 @@ BATCH.Setup.analysisunits = 1;
 BATCH.Setup.voxelmask = 1;
 BATCH.Setup.voxelmaskfile = atlas_mask_filename;
 
+
+%{
+
 %BATCH.Setup.preprocessing note: (NOT DOING THIS)
 
 %Denoising
 
 %NOTE: Ignore steps bcuz denoising was done in preproc pipeline. If you want denoising to be done, set BATCH.Denoising.done = 1 and edit options below.
-%{
 BATCH.Denoising.detrending = 0;
 BATCH.Denoising.despiking = 0;
 BATCH.Denoising.regbp = 1;
 BATCH.Denoising.confounds.names = ['Grey Matter', 'White Matter', 'CSF']; 
-%}
-
 BATCH.Denoising.done = 0;
-
-%{
 
 %Run First-level Analysis (ROI-to-ROI and Seed-to-Voxel)
 BATCH.Analysis.done = 1;
