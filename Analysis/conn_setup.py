@@ -12,4 +12,4 @@ list_T1 = [i for i in listdir_T1]
 list_fMRI = [i for i in listdir_T1]
 
 for subj in list_T1:
-    subj_renamed = 
+    subj_renamed =
