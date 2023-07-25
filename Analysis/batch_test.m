@@ -2,28 +2,28 @@ clear BATCH;
 
 %variables
 
-project_name = 'conn_batchtest_Jul22.mat';
+project_name = 'conn_batchtest_run03.mat';
 
-n=104; %number of subjects
+n=143; %number of subjects
 r=1; %number of runs (sessions)
 TR = 2.252;
 
 ICA_components = 20;
 DYN_components = 20;
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %import datasheet
-data = readtable("/Users/Jayvik/Desktop/run01_inputs/data_csv.csv");
-numRows = size(data, 1);
-numCols = size(data, 2);
-ID = data.('ID');
 
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
 %Setting up directories
-input_dir = '/Users/Jayvik/Desktop/run01_inputs/';
+input_dir = '/Users/Jayvik/Desktop/run03_inputs/';
 reference_dir = strcat(input_dir, 'reference_maps/');
 fmri_dir = strcat(input_dir, 'processed_fmri/');
 T1_dir = strcat(input_dir, 'processed_T1/');
 output_dir = '/Users/Jayvik/Desktop/conn_output/';
+
+data = readtable(strcat(input_dir, 'data_csv143.csv'));
+numRows = size(data, 1);
+numCols = size(data, 2);
+ID = data.('ID');
 
 %Referencing maps
 gm_mask_filename = strcat(reference_dir, 'gm_mask.nii');
@@ -34,11 +34,11 @@ atlas_filename = strcat(reference_dir, 'chass_atlas.nii');
 networks_filename = strcat(reference_dir, 'amyg_hippo_olfactory.nii');
 
 %roi_names = {'networks'; 'atlas'};
-files = dir(strcat(reference_dir, 'each_region/'));
+files = dir(strcat(reference_dir, 'regions/'));
 roi_files = {};
 
 for k = 4:length(files)
-    roi_files{end+1} = strcat(reference_dir, 'each_region/', files(k).name);
+    roi_files{end+1} = strcat(reference_dir, 'regions/', files(k).name);
 
 end
 
