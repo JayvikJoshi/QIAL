@@ -15,12 +15,11 @@
     - restack_slices.py: takes fMRI 3D Volumes and restacks into 4D NIFTI
     - separate_slices.py: takes fMRI 4D NIFTI and breaks down into 3D volumes
     - T1_resampler.py: resamples T1 images to 0.3mm^3 resolution
-
 - Analysis
   - melodic.py: code to run FSL Melodic from terminal (important for mice since it can bypass masking step)
   - gift_setup.py: sets up files and filenames for Group ICA of fMRI Toolbox to organize better (important because subjects need to be in their own folder)
   - conn_setup.py: sets up files and filenames for Conn Toolbox (*** INCOMPLETE ***)
-  - batch_test.m: runs Conn **
+  - batch_test.m: sets up conn to run. Run file in matlab, type conn_batch(BATCH) in matlab terminal, open conn and open project
 - NyquistGhost: document containing nyquist ghost research, papers, links to githubs of codes. (Minnesota code is of interest)
 - Archive: unnecessary or incomplete scripts
   - conn_setup.py: sets up files and filenames for Conn Toolbox (*** INCOMPLETE ***)
